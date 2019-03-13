@@ -97,6 +97,70 @@ class TextParserTest extends FlatSpec with Matchers {
 
         testParser(text) should contain (expOutput)
     }
+
+    it should "throw an error if BOUNDING-BOX isn't the first command" in {
+        var errMsg : String = ""
+        val onError = (txt: String) => {errMsg = txt}
+        val testParser = textParser(new MockCommandTransformer, onError)
+        val text =
+            """(LINE (1 2)   (21 22))
+              |(BOUNDING-BOX (1 2) (21 22))
+            """.stripMargin
+        testParser(text) shouldBe empty
+        errMsg should be (s"ERROR parsing: '$text'")
+    }
+
+    it should "throw an error on missing end parenthesis" in {
+        var errMsg : String = ""
+        val onError = (txt: String) => {errMsg = txt}
+        val testParser = textParser(new MockCommandTransformer, onError)
+        val text =
+            """(BOUNDING-BOX (1 2) (21 22))
+              |(LINE (1 2)   (21 22)
+            """.stripMargin
+        errMsg shouldBe empty
+        testParser(text) shouldBe empty
+        errMsg should not be empty
+    }
+
+    it should "throw an error on missing parenthesis in middle" in {
+        var errMsg : String = ""
+        val onError = (txt: String) => {errMsg = txt}
+        val testParser = textParser(new MockCommandTransformer, onError)
+        val text =
+            """(BOUNDING-BOX (1 2) (21 22)
+              |(LINE (1 2)   (21 22))
+            """.stripMargin
+        errMsg shouldBe empty
+        testParser(text) shouldBe empty
+        errMsg should be (s"ERROR parsing: '$text'")
+    }
+
+    it should "throw an error on malformed command" in {
+        var errMsg : String = ""
+        val onError = (txt: String) => {errMsg = txt}
+        val testParser = textParser(new MockCommandTransformer, onError)
+        val text =
+            """(BOUNDING-BOX (1 2) (21 22))
+              |(LANE (1 2)  (21 22))
+            """.stripMargin
+        errMsg shouldBe empty
+        testParser(text) shouldBe empty
+        errMsg should not be empty
+    }
+
+    it should "throw an error on malformed argument" in {
+        var errMsg : String = ""
+        val onError = (txt: String) => {errMsg = txt}
+        val testParser = textParser(new MockCommandTransformer, onError)
+        val text =
+            """(BOUNDING-BOX (1 2) (21 22))
+              |(LINE 42  (21 22))
+            """.stripMargin
+        errMsg shouldBe empty
+        testParser(text) shouldBe empty
+        errMsg should not be empty
+    }
 }
 
 

@@ -46,16 +46,13 @@ object TextParser {
                                                     , parseCommandList(rest, transformer)
                             )
                         )
-
                     case default =>
                         throw new InvalidCommandException(text)
-
                 }
             } catch {
                 case e: InvalidCommandException =>
                     onError(s"ERROR parsing: '${e.getMessage}'")
                     None
-
             }
         }
     }
@@ -111,7 +108,7 @@ object TextParser {
     private val numRgx = """(\d+)""".r
     private val stringRgx = "\"(.*)\"".r
     private val colorRgx = """(#F\d\d\d\d\d\d)""".r
-    private val restRgx = """([\s\S]*)""".r
+    private val restRgx = """([\s\S]+)""".r
     private val cmdRgx = s"""\\(\\s*$nameRgx\\s+$argRgx\\s+$argRgx\\s*\\)""".r
     private val cmdRestRgx = s"""\\(\\s*$nameRgx\\s+$argRgx\\s+$argRgx\\s*\\)\\s*$restRgx""".r
     private val listRgx = """\(([^\n]+)\)""".r
