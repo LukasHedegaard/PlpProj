@@ -32,6 +32,7 @@ class BitmapOps(con:Controller) {
     val L12 = makeList(L11,x0-y, y0-x,c,s)//printPoint(x0-y, y0-x,c)
     if (x>=y) {
       con.showError("ERROR During blah")// is this resonable
+      fill(L12)
       return L12
     }
 
@@ -54,7 +55,22 @@ class BitmapOps(con:Controller) {
     }
   }
   def fill(list:List[(Int,Int,Color,String)])={
+    var i=0
+    for (elem <- list) {
+      for (elem2 <- list){
+        if (elem._2 == elem2._2 & elem._1!=elem2._1) {
+          val x1 = elem._1
+          val y1 = elem._2
+          val x2 = elem2._1
+          val y2 = elem2._2
 
+          i=i+1
+          println(s"drawing $i th line from $x1,$y2 to $x2,$y2")//draw line
+          // return list from draw linne should be appended to the rest by makelist
+        }
+
+      }
+    }
   }
 
   def makeList(list:List[(Int,Int,Color,String)],x:Int,y:Int, c:Color,s:String):List[(Int,Int,Color,String)]={
