@@ -16,6 +16,12 @@ public class Controller {
     public Canvas canvas;
     int i = 1;
     Color circleColor = Color.web("#0000FF");
+    BitmapOps bitmapOps = new BitmapOps(this);
+    TextparserJava parser = new TextparserJava(bitmapOps);
+    //private TextParser parser = TextParser.textParser(bitmapOps,null);
+    //private TextParser parser = new TextParser(bitmapOps)
+
+
 
     class Point{
         int x;
@@ -25,15 +31,15 @@ public class Controller {
 
     public void inputChanged(KeyEvent keyEvent) {
         String hello = keyEvent.getText();
+        //TextParser.textParser(bitmapOps,null);
+        parser.textParserJava(hello);
+        //List L = (bitmapOps.startMidtpoint(200,200,10*i,circleColor));
+        //List L2 =(bitmapOps.typeString(30*i,40*i,circleColor,"hello World"));
 
-        BitmapOps bitmapOps = new BitmapOps(this);
-        List L = (bitmapOps.startMidtpoint(200,200,10*i,circleColor));
-        List L2 =(bitmapOps.typeString(30*i,40*i,circleColor,"hello World"));
+        //drawOnCanvas(L,i);
+        //drawOnCanvas(L2,i);
 
-        drawOnCanvas(L,i);
-        drawOnCanvas(L2,i);
-
-        i++;
+        //i++;
 
     }
     public void drawOnCanvas(List L,int i){

@@ -1,8 +1,51 @@
 package sample
 
 import javafx.scene.paint.Color
+import sample.TextParser.CommandTransformer
+
 import scala.collection.JavaConverters._
-class BitmapOps(con:Controller) {
+import TextParser.textParser
+
+
+class TextparserJava(bitmapOps: BitmapOps){
+  def textParserJava(in:String):java.util.List[(Int, Int, Color,String)]={
+    val textParserjava = textParser(bitmapOps, println)
+    return textParserjava(in).asJava
+  }
+}
+
+class BitmapOps(con:Controller) extends CommandTransformer[List[(Int, Int, Color,String)]]{
+
+
+  def combine(p: List[(Int, Int, Color,String)], q: List[(Int, Int, Color,String)]): List[(Int, Int, Color,String)] = {
+    return List[(Int,Int,Color,String)]()
+  }
+  def line(x1: Int, y1: Int, x2:Int, y2:Int): List[(Int, Int, Color,String)] = {
+    return List[(Int,Int,Color,String)]()
+  }
+  def rectangle(x1: Int, y1: Int, x2: Int, y2: Int): List[(Int, Int, Color,String)] = {
+    return List[(Int,Int,Color,String)]()
+  }
+  def circle(x: Int, y: Int, r: Int): List[(Int, Int, Color,String)] = {
+
+    return startMidtpoint(x,y,r,Color.web("#0000FF"))
+  }
+  def textAt(x: Int, y: Int, t: String): List[(Int, Int, Color,String)] = {
+    return List[(Int,Int,Color,String)]()
+  }
+  def boundingBox(x1: Int, y1: Int, x2: Int, y2: Int): List[(Int, Int, Color,String)] = {
+    return List[(Int,Int,Color,String)]()
+  }
+  def boundingBox(x1: Int, y1: Int, x2: Int, y2: Int, rest: List[(Int, Int, Color,String)]): List[(Int, Int, Color,String)] = {
+    return List[(Int,Int,Color,String)]()
+  }
+  def draw(c: String, rest: List[(Int, Int, Color,String)]): List[(Int, Int, Color,String)] = {
+    return List[(Int,Int,Color,String)]()
+  }
+  def fill(c: String, g: List[(Int, Int, Color,String)]): List[(Int, Int, Color,String)] = {
+    return List[(Int,Int,Color,String)]()
+  }
+
 
   def startMidtpoint(x0:Int, y0:Int, radius:Int, c:Color):java.util.List[(Int, Int, Color,String)]={
     val f=1-radius
@@ -43,9 +86,9 @@ class BitmapOps(con:Controller) {
       circleBody(L12,x0,y0,x+1,y,ddF_x+2,ddF_y,f+ddF_x,c)
     }
   }
-  def typeString(x:Int,y:Int,c:Color,s:String):java.util.List[(Int, Int, Color,String)] ={
+  def typeString(x:Int,y:Int,c:Color,s:String):List[(Int, Int, Color,String)] ={
     val L = List[(Int,Int,Color,String)]()
-    return makeList(L,x,y,c,s).asJava
+    return makeList(L,x,y,c,s)
   }
 
   def printList(list:List[(Int,Int,Color,String)])={
