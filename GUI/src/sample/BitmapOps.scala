@@ -10,7 +10,12 @@ import TextParser.textParser
 class TextparserJava(bitmapOps: BitmapOps){
   def textParserJava(in:String):java.util.List[(Int, Int, Color,String)]={
     val textParserjava = textParser(bitmapOps, println)
-    return textParserjava(in).asJava
+    val L_fail = List[(Int,Int,Color,String)]()
+    var d = List[(Int,Int,Color,String)]()
+    val L = textParserjava(in).getOrElse(L_fail)
+    return L.asJava
+
+    //return bitmapOps.circle(200, 100, 50).asJava
   }
 }
 
@@ -37,7 +42,7 @@ class BitmapOps(con:Controller) extends CommandTransformer[List[(Int, Int, Color
     return List[(Int,Int,Color,String)]()
   }
   def boundingBox(x1: Int, y1: Int, x2: Int, y2: Int, rest: List[(Int, Int, Color,String)]): List[(Int, Int, Color,String)] = {
-    return List[(Int,Int,Color,String)]()
+    return startMidtpoint(x1,y1,x2,Color.web("#0000FF"))
   }
   def draw(c: String, rest: List[(Int, Int, Color,String)]): List[(Int, Int, Color,String)] = {
     return List[(Int,Int,Color,String)]()
@@ -47,7 +52,7 @@ class BitmapOps(con:Controller) extends CommandTransformer[List[(Int, Int, Color
   }
 
 
-  def startMidtpoint(x0:Int, y0:Int, radius:Int, c:Color):java.util.List[(Int, Int, Color,String)]={
+  def startMidtpoint(x0:Int, y0:Int, radius:Int, c:Color):List[(Int, Int, Color,String)]={
     val f=1-radius
     val ddF_x=1
     val ddF_y= -2*radius
@@ -60,7 +65,7 @@ class BitmapOps(con:Controller) extends CommandTransformer[List[(Int, Int, Color
     val L3 = makeList(L2,x0+radius,y0,c,s)//printPoint(x0+radius, y0,c)
     val L4 = makeList(L3,x0-radius,y0,c,s)//printPoint(x0-radius, y0,c)
 
-    return circleBody(L4,x0,y0,x,y,ddF_x,ddF_y,f,c).asJava // enables java to understand the format
+    return circleBody(L4,x0,y0,x,y,ddF_x,ddF_y,f,c)
   }
 
   def circleBody(list:List[(Int,Int,Color,String)],x0:Int, y0:Int, x:Int, y:Int, ddF_x:Int, ddF_y:Int, f:Int, c:Color):List[(Int, Int, Color,String)]={
@@ -74,8 +79,8 @@ class BitmapOps(con:Controller) extends CommandTransformer[List[(Int, Int, Color
     val L11 = makeList(L10,x0+y, y0-x,c,s)//printPoint(x0+y, y0-x,c)
     val L12 = makeList(L11,x0-y, y0-x,c,s)//printPoint(x0-y, y0-x,c)
     if (x>=y) {
-      con.showError("ERROR During blah")// is this resonable
-      fill(L12)
+      //con.showError("ERROR During blah")// is this resonable
+      //fill(L12)
       return L12
     }
 

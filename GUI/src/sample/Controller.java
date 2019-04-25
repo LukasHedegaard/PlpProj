@@ -30,13 +30,20 @@ public class Controller {
     }
 
     public void inputChanged(KeyEvent keyEvent) {
-        String hello = keyEvent.getText();
+        String hello = textInput.getText();
+        System.out.println(hello);
         //TextParser.textParser(bitmapOps,null);
-        parser.textParserJava(hello);
+        try{
+            List L = parser.textParserJava(hello);
+            drawOnCanvas(L,i);
+        }catch(Exception e){
+            System.out.println("error in input");
+        }
+
         //List L = (bitmapOps.startMidtpoint(200,200,10*i,circleColor));
         //List L2 =(bitmapOps.typeString(30*i,40*i,circleColor,"hello World"));
 
-        //drawOnCanvas(L,i);
+
         //drawOnCanvas(L2,i);
 
         //i++;
