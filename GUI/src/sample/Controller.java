@@ -55,7 +55,7 @@ public class Controller {
             if (t._4()==null) {
                 canvas.getGraphicsContext2D().getPixelWriter().setColor(t._1(), t._2(), t._3());
             }else{
-                canvas.getGraphicsContext2D().strokeText(t._4(),30*i,40*i);
+                canvas.getGraphicsContext2D().strokeText(t._4(),t._1(),t._2());
             }
         }
     }

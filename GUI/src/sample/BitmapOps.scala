@@ -13,6 +13,7 @@ class TextparserJava(bitmapOps: BitmapOps){
     val L_fail = List[(Int,Int,Color,String)]()
     var d = List[(Int,Int,Color,String)]()
     val L = textParserjava(in).getOrElse(L_fail)
+    //val L = option.toList.flatten ++ L_fail
     return L.asJava
 
     //return bitmapOps.circle(200, 100, 50).asJava
