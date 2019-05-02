@@ -9,7 +9,7 @@ import TextParser.textParser
 
 class TextparserJava(bitmapOps: BitmapOps){
   def textParserJava(in:String):java.util.List[(Int, Int, Color,String)]={
-    val textParserjava = textParser(bitmapOps, println)
+    val textParserjava = textParser(bitmapOps, bitmapOps.controler.showError)
     val L_fail = List[(Int,Int,Color,String)]()
     var d = List[(Int,Int,Color,String)]()
     val L = textParserjava(in).getOrElse(L_fail)
@@ -21,29 +21,35 @@ class TextparserJava(bitmapOps: BitmapOps){
 }
 
 class BitmapOps(con:Controller) extends CommandTransformer[List[(Int, Int, Color,String)]]{
-
+  val stdColor = Color.web("#0000FF")
+  val controler = con;
 
   def combine(p: List[(Int, Int, Color,String)], q: List[(Int, Int, Color,String)]): List[(Int, Int, Color,String)] = {
-    return List[(Int,Int,Color,String)]()
+    return p:::q
   }
   def line(x1: Int, y1: Int, x2:Int, y2:Int): List[(Int, Int, Color,String)] = {
-    return List[(Int,Int,Color,String)]()
+    val pointList = lineStart(x1, y1, x2, y2)
+    return f(pointList,List[(Int, Int, Color,String)]())
   }
   def rectangle(x1: Int, y1: Int, x2: Int, y2: Int): List[(Int, Int, Color,String)] = {
-    return List[(Int,Int,Color,String)]()
+    val recList = rectangledraw(x1, y1, x2, y2)
+    return f(recList,List[(Int, Int, Color,String)]())
   }
   def circle(x: Int, y: Int, r: Int): List[(Int, Int, Color,String)] = {
 
-    return startMidtpoint(x,y,r,Color.web("#0000FF"))
+    return startMidtpoint(x,y,r,stdColor)
   }
   def textAt(x: Int, y: Int, t: String): List[(Int, Int, Color,String)] = {
-    return List[(Int,Int,Color,String)]()
+    return typeString(x,y,null,t)
   }
   def boundingBox(x1: Int, y1: Int, x2: Int, y2: Int): List[(Int, Int, Color,String)] = {
     return List[(Int,Int,Color,String)]()
   }
   def boundingBox(x1: Int, y1: Int, x2: Int, y2: Int, rest: List[(Int, Int, Color,String)]): List[(Int, Int, Color,String)] = {
-    return startMidtpoint(x1,y1,x2,Color.web("#0000FF"))
+    return rest.filter(coor=>coor._1>=x1
+                    && coor._1 <= x2
+                    && coor._2 >= y1
+                    && coor._2 <= y2)
   }
   def draw(c: String, rest: List[(Int, Int, Color,String)]): List[(Int, Int, Color,String)] = {
     return List[(Int,Int,Color,String)]()
@@ -51,7 +57,10 @@ class BitmapOps(con:Controller) extends CommandTransformer[List[(Int, Int, Color
   def fill(c: String, g: List[(Int, Int, Color,String)]): List[(Int, Int, Color,String)] = {
     return List[(Int,Int,Color,String)]()
   }
-
+  def f(list: List[Point], newList: List[(Int, Int, Color, String)]): List[(Int, Int, Color, String)] = list match{
+    case Nil => return newList
+    case head :: rest => f(rest, (head.x, head.y, stdColor, null) :: newList)
+  }
 
   def startMidtpoint(x0:Int, y0:Int, radius:Int, c:Color):List[(Int, Int, Color,String)]={
     val f=1-radius
@@ -126,5 +135,74 @@ class BitmapOps(con:Controller) extends CommandTransformer[List[(Int, Int, Color
     return list:+(x,y,c,s)
   }
 
+  // line
+  class Point(val x: Int, val y: Int)
+
+  def mapc(list: List[Point], func: Point => Point, cont: List[Point] => List[Point]): List[Point] = list match {
+    case Nil => cont(Nil)
+    case head :: rest => mapc(rest, func, x => cont( func(head) :: x))
+  }
+
+  def lineR(x1: Int, y1: Int, x2: Int, y2: Int, dx: Int, dy: Int, d: Int, list: List[Point]): List[Point] = {
+
+    if(x1 == x2) {
+      return new Point(x1, y2) :: list
+    } else {
+      val myList = new Point(x1, y1) :: list
+
+      if(d > 0) {
+        lineR(x1 + 1, y1 + 1, x2, y2, dx, dy, d - 2*dx + 2*dy, myList)
+      } else {
+        lineR(x1 + 1, y1, x2, y2, dx, dy, d + 2*dy, myList)
+      }
+    }
+  }
+
+  def lineStart(x1in: Int, y1in: Int, x2in: Int, y2in: Int): List[Point] = {
+
+    // place line at 0,0
+    val x1 = 0
+    val x2 = x2in - x1in
+    val y1 = 0
+    val y2 = y2in - y1in
+
+    // find out what octant
+    if(y2 > x2) { // bad octant
+
+      val d = 2*x2 - y2
+
+      // create list as if it was in good octant
+      val list = lineR(x1, y1, y2, x2, y2, x2, d, List[Point]())
+
+      // flip line to bad octant
+      val flipList = mapc(list, point => new Point(point.y, point.x), x => x)
+
+      // place back at x1,y2
+      return mapc(flipList, point => new Point(point.x + x1in, point.y + y1in), x => x)
+
+    } else { // good octant
+
+      val d = 2*y2 - x2
+
+      // create list in good octant
+      val list = lineR(x1, y1, x2, y2, x2, y2, d, List[Point]())
+
+      // place back at x1, y2
+      return mapc(list, point => new Point(point.x + x1in, point.y + y1in), x => x)
+    }
+  }
+  def concat(list1: List[Point], list2: List[Point]): List[Point] = list1 match {
+    case Nil => list2
+    case head :: rest => head :: concat(rest, list2)
+  }
+  def rectangledraw(x1: Int, y1: Int, x2: Int, y2: Int): List[Point] = {
+    val bottom = lineStart(x1, y1, x2, y1) // Bottom line
+    val right = lineStart(x2, y1, x2, y2) // Right line
+    val top = lineStart(x1, y2, x2, y2) // Top line
+    val left = lineStart(x1, y1, x1, y2) // Left line
+
+    return concat(concat(bottom, right), concat(top, left))
+
+  }
 
 }
