@@ -1,5 +1,6 @@
 package sample;
 
+import javafx.application.Platform;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.PixelWriter;
@@ -17,7 +18,8 @@ public class Controller {
     public TextArea textOutput;
     public TextArea textInput;
     public Canvas canvas;
-    Timer timer;
+    public boolean timerTaskRunning = false;
+    Timer timer=new Timer();
     List L;
 
     int i = 1;
@@ -28,6 +30,16 @@ public class Controller {
     //private TextParser parser = TextParser.textParser(bitmapOps,null);
     //private TextParser parser = new TextParser(bitmapOps)
 
+    Runnable runTask = new Runnable() {
+        @Override
+        public void run() {
+            //double width = canvas.getWidth();
+            //double height = canvas.getHeight();
+            //canvas.getGraphicsContext2D().clearRect(0,0,width,height);
+            drawOnCanvas(L);
+            timerTaskRunning=false;
+        }
+    };
 
 
     class Point{
@@ -39,16 +51,17 @@ public class Controller {
     public void inputChanged(KeyEvent keyEvent) {
         String hello = textInput.getText();
         System.out.println(hello);
-        timer = new Timer();
+        //timer = new Timer();
 
         TimerTask task = new TimerTask()
         {
             public void run()
             {
-                double width = canvas.getWidth();
-                double height = canvas.getHeight();
-                canvas.getGraphicsContext2D().clearRect(0,0,width,height);
-                drawOnCanvas(L);
+                //double width = canvas.getWidth();
+                //double height = canvas.getHeight();
+                //canvas.getGraphicsContext2D().clearRect(0,0,width,height);
+                Platform.runLater(runTask);
+
             }
 
         };
@@ -65,7 +78,15 @@ public class Controller {
         }
 
         try{
-            timer.schedule(task,5000l);
+            if(!timerTaskRunning) {
+                timerTaskRunning=true;
+                timer=new Timer();
+                timer.schedule(task, 2000l);
+            }else{
+                timer.cancel();
+                timer = new Timer();
+                timer.schedule(task, 2000l);
+            }
         }catch (Exception e){
             System.out.println(e);
         }
