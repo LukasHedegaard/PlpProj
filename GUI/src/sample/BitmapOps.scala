@@ -29,11 +29,11 @@ class BitmapOps(con:Controller) extends CommandTransformer[List[(Int, Int, Color
   }
   def line(x1: Int, y1: Int, x2:Int, y2:Int): List[(Int, Int, Color,String)] = {
     val pointList = lineStart(x1, y1, x2, y2)
-    return f(pointList,List[(Int, Int, Color,String)]())
+    return convertFromPointToTuple(pointList,List[(Int, Int, Color,String)]())
   }
   def rectangle(x1: Int, y1: Int, x2: Int, y2: Int): List[(Int, Int, Color,String)] = {
     val recList = rectangledraw(x1, y1, x2, y2)
-    return f(recList,List[(Int, Int, Color,String)]())
+    return convertFromPointToTuple(recList,List[(Int, Int, Color,String)]())
   }
   def circle(x: Int, y: Int, r: Int): List[(Int, Int, Color,String)] = {
 
@@ -47,20 +47,19 @@ class BitmapOps(con:Controller) extends CommandTransformer[List[(Int, Int, Color
   }
   def boundingBox(x1: Int, y1: Int, x2: Int, y2: Int, rest: List[(Int, Int, Color,String)]): List[(Int, Int, Color,String)] = {
     return rest.filter(coor=>coor._1>=x1
-                    && coor._1 <= x2
-                    && coor._2 >= y1
-                    && coor._2 <= y2)
+                      && coor._1 <= x2
+                      && coor._2 >= y1
+                      && coor._2 <= y2)
   }
   def draw(c: String, rest: List[(Int, Int, Color,String)]): List[(Int, Int, Color,String)] = {
-    return List[(Int,Int,Color,String)]()
+    val drawfunctionColor = Color.web("#00FF0F")
+    return drawfunc(drawfunctionColor, rest,List[(Int, Int, Color,String)]())
   }
   def fill(c: String, g: List[(Int, Int, Color,String)]): List[(Int, Int, Color,String)] = {
-    return List[(Int,Int,Color,String)]()
+    val fillfunctionColor = Color.web("#0F0F0F")
+    return fillfunc(fillfunctionColor,g,List[(Int, Int, Color,String)]())
   }
-  def f(list: List[Point], newList: List[(Int, Int, Color, String)]): List[(Int, Int, Color, String)] = list match{
-    case Nil => return newList
-    case head :: rest => f(rest, (head.x, head.y, stdColor, null) :: newList)
-  }
+
 
   def startMidtpoint(x0:Int, y0:Int, radius:Int, c:Color):List[(Int, Int, Color,String)]={
     val f=1-radius
@@ -70,27 +69,25 @@ class BitmapOps(con:Controller) extends CommandTransformer[List[(Int, Int, Color
     val y=radius
     val s = null
     val L = List[(Int,Int,Color,String)]()
-    val L1 = makeList(L,x0,y0+radius,c,s)//printPoint(x0, y0+radius,c)
-    val L2 = makeList(L1,x0,y0-radius,c,s)//printPoint(x0, y0-radius,c)
-    val L3 = makeList(L2,x0+radius,y0,c,s)//printPoint(x0+radius, y0,c)
-    val L4 = makeList(L3,x0-radius,y0,c,s)//printPoint(x0-radius, y0,c)
+    val L1 = addTupleToList(L,x0,y0+radius,c,s)
+    val L2 = addTupleToList(L1,x0,y0-radius,c,s)
+    val L3 = addTupleToList(L2,x0+radius,y0,c,s)
+    val L4 = addTupleToList(L3,x0-radius,y0,c,s)
 
     return circleBody(L4,x0,y0,x,y,ddF_x,ddF_y,f,c)
   }
 
   def circleBody(list:List[(Int,Int,Color,String)],x0:Int, y0:Int, x:Int, y:Int, ddF_x:Int, ddF_y:Int, f:Int, c:Color):List[(Int, Int, Color,String)]={
     val s = null
-    val L5 = makeList(list,x0+x, y0+y,c,s)//printPoint(x0+x, y0+y,c)
-    val L6 = makeList(L5,x0-x, y0+y,c,s)//printPoint(x0-x, y0+y,c)
-    val L7 = makeList(L6,x0+x, y0-y,c,s)//printPoint(x0+x, y0-y,c)
-    val L8 = makeList(L7,x0-x, y0-y,c,s)//printPoint(x0-x, y0-y,c)
-    val L9 = makeList(L8,x0+y, y0+x,c,s)//printPoint(x0+y, y0+x,c)
-    val L10 = makeList(L9,x0-y, y0+x,c,s)//printPoint(x0-y, y0+x,c)
-    val L11 = makeList(L10,x0+y, y0-x,c,s)//printPoint(x0+y, y0-x,c)
-    val L12 = makeList(L11,x0-y, y0-x,c,s)//printPoint(x0-y, y0-x,c)
+    val L5 = addTupleToList(list,x0+x, y0+y,c,s)
+    val L6 = addTupleToList(L5,x0-x, y0+y,c,s)
+    val L7 = addTupleToList(L6,x0+x, y0-y,c,s)
+    val L8 = addTupleToList(L7,x0-x, y0-y,c,s)
+    val L9 = addTupleToList(L8,x0+y, y0+x,c,s)
+    val L10 = addTupleToList(L9,x0-y, y0+x,c,s)
+    val L11 = addTupleToList(L10,x0+y, y0-x,c,s)
+    val L12 = addTupleToList(L11,x0-y, y0-x,c,s)
     if (x>=y) {
-      //con.showError("ERROR During blah")// is this resonable
-      //fill(L12)
       return L12
     }
 
@@ -103,7 +100,7 @@ class BitmapOps(con:Controller) extends CommandTransformer[List[(Int, Int, Color
   }
   def typeString(x:Int,y:Int,c:Color,s:String):List[(Int, Int, Color,String)] ={
     val L = List[(Int,Int,Color,String)]()
-    return makeList(L,x,y,c,s)
+    return addTupleToList(L,x,y,c,s)
   }
 
   def printList(list:List[(Int,Int,Color,String)])={
@@ -112,26 +109,8 @@ class BitmapOps(con:Controller) extends CommandTransformer[List[(Int, Int, Color
       case _ => println("Done")
     }
   }
-  def fill(list:List[(Int,Int,Color,String)])={
-    var i=0
-    for (elem <- list) {
-      for (elem2 <- list){
-        if (elem._2 == elem2._2 & elem._1!=elem2._1) {
-          val x1 = elem._1
-          val y1 = elem._2
-          val x2 = elem2._1
-          val y2 = elem2._2
 
-          i=i+1
-          println(s"drawing $i th line from $x1,$y2 to $x2,$y2")//draw line
-          // return list from draw linne should be appended to the rest by makelist
-        }
-
-      }
-    }
-  }
-
-  def makeList(list:List[(Int,Int,Color,String)],x:Int,y:Int, c:Color,s:String):List[(Int,Int,Color,String)]={
+  def addTupleToList(list:List[(Int,Int,Color,String)],x:Int,y:Int, c:Color,s:String):List[(Int,Int,Color,String)]={
     return list:+(x,y,c,s)
   }
 
@@ -191,6 +170,10 @@ class BitmapOps(con:Controller) extends CommandTransformer[List[(Int, Int, Color
       return mapc(list, point => new Point(point.x + x1in, point.y + y1in), x => x)
     }
   }
+  def convertFromPointToTuple(list: List[Point], newList: List[(Int, Int, Color, String)]): List[(Int, Int, Color, String)] = list match{
+    case Nil => return newList
+    case head :: rest => convertFromPointToTuple(rest, (head.x, head.y, stdColor, null) :: newList)
+  }
   def concat(list1: List[Point], list2: List[Point]): List[Point] = list1 match {
     case Nil => list2
     case head :: rest => head :: concat(rest, list2)
@@ -205,4 +188,30 @@ class BitmapOps(con:Controller) extends CommandTransformer[List[(Int, Int, Color
 
   }
 
+  // draw
+  //draw run a list of graphs and for each one run the list of point
+  //change the color of each point of those lists
+  //return a list of points
+
+  def drawfunc(c_new: Color, rest: List[(Int, Int, Color,String)], newList:List[(Int, Int, Color,String)]): List[(Int, Int, Color,String)] =rest match{
+    case Nil => return newList
+    case head :: tail => drawfunc(c_new,tail,(head._1, head._2, c_new, null) :: newList)
+  }
+
+  //fill
+  //change the color between the boundaries of a figure
+  //return a list of point with a diferent color (the point inside the figure)
+  def fillfunc(c: Color, g: List[(Int, Int, Color,String)], newList:List[(Int, Int, Color,String)]): List[(Int, Int, Color,String)]= g match{
+    case Nil => return drawfunc(c,newList,List[(Int, Int, Color,String)]())
+    case head :: tail => {
+      val point: Option[(Int, Int, Color, String)] = tail.find(coords => coords._2 == head._2 && coords._1 != head._1)
+      if (!point.isEmpty) {
+        val linepoints = lineStart(head._1, head._2,point.head._1, point.head._2)
+        val line = convertFromPointToTuple(linepoints, List[(Int, Int, Color, String)]())
+        fillfunc(c, tail, newList ::: line)
+      }else {
+        fillfunc(c, tail, newList)
+      }
+    }
+  }
 }
