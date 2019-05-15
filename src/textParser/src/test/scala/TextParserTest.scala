@@ -87,13 +87,13 @@ class TextParserTest extends FlatSpec with Matchers {
         val testParser = textParser(new MockCommandTransformer)
         val text =
             """(BOUNDING-BOX (1 2) (21 22))
-              |(DRAW #F123456 (RECTANGLE (1 2) (21 22)))
-              |(DRAW #F123456 (RECTANGLE (1 2) (21 22)) (LINE (1 2) (21 22)))
-              |(DRAW #F123456 (RECTANGLE (1 2) (21 22)) (LINE (1 2) (21 22)) (TEXT-AT (1 2) \"Hello World\"))
-              |(FILL #F123456 (RECTANGLE (1 2) (21 22)))
+              |(DRAW #F23456 (RECTANGLE (1 2) (21 22)))
+              |(DRAW #F23456 (RECTANGLE (1 2) (21 22)) (LINE (1 2) (21 22)))
+              |(DRAW #F23456 (RECTANGLE (1 2) (21 22)) (LINE (1 2) (21 22)) (TEXT-AT (1 2) \"Hello World\"))
+              |(FILL #F23456 (RECTANGLE (1 2) (21 22)))
             """.stripMargin
         val expOutput =
-            """Bounding box from (1, 2) to (21, 22) containing Draw color #F123456 on Rectangle from (1, 2) to (21, 22) and Draw color #F123456 on Rectangle from (1, 2) to (21, 22) and Line from (1, 2) to (21, 22) and Draw color #F123456 on Rectangle from (1, 2) to (21, 22) and Line from (1, 2) to (21, 22) and Text at (1, 2) with value "Hello World" and Fill color #F123456 on Rectangle from (1, 2) to (21, 22)"""
+            """Bounding box from (1, 2) to (21, 22) containing Draw color #F23456 on Rectangle from (1, 2) to (21, 22) and Draw color #F23456 on Rectangle from (1, 2) to (21, 22) and Line from (1, 2) to (21, 22) and Draw color #F23456 on Rectangle from (1, 2) to (21, 22) and Line from (1, 2) to (21, 22) and Text at (1, 2) with value "Hello World" and Fill color #F23456 on Rectangle from (1, 2) to (21, 22)"""
 
         testParser(text) should contain (expOutput)
     }

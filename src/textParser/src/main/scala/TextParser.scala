@@ -107,7 +107,7 @@ object TextParser {
     private val pointRgx = """\((\d+)\s+(\d+)\)""".r
     private val numRgx = """(\d+)""".r
     private val stringRgx = "\"(.*)\"".r
-    private val colorRgx = """(#F\d\d\d\d\d\d)""".r
+    private val colorRgx = """(#[0-9A-F]{6})""".r
     private val restRgx = """([\s\S]+)""".r
     private val cmdRgx = s"""\\(\\s*$nameRgx\\s+$argRgx\\s+$argRgx\\s*\\)""".r
     private val cmdRestRgx = s"""\\(\\s*$nameRgx\\s+$argRgx\\s+$argRgx\\s*\\)\\s*$restRgx""".r
