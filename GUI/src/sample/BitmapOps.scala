@@ -53,11 +53,14 @@ class BitmapOps(con:Controller) extends CommandTransformer[List[(Int, Int, Color
   }
   def draw(c: String, rest: List[(Int, Int, Color,String)]): List[(Int, Int, Color,String)] = {
     val drawfunctionColor = Color.web("#00FF0F")
-    return drawfunc(drawfunctionColor, rest,List[(Int, Int, Color,String)]())
+    return drawfunc(drawfunctionColor, rest,x => x)
   }
   def fill(c: String, g: List[(Int, Int, Color,String)]): List[(Int, Int, Color,String)] = {
     val fillfunctionColor = Color.web("#0F0F0F")
-    return fillfunc(fillfunctionColor,g,List[(Int, Int, Color,String)]())
+    val fillList = fillfunc1(fillfunctionColor,g,List[(Int, Int, Color,String)]())
+
+    //return drawfunc(fillfunctionColor,fillList,x=>x)
+    return fillList
   }
 
 
@@ -120,6 +123,16 @@ class BitmapOps(con:Controller) extends CommandTransformer[List[(Int, Int, Color
   def mapc(list: List[Point], func: Point => Point, cont: List[Point] => List[Point]): List[Point] = list match {
     case Nil => cont(Nil)
     case head :: rest => mapc(rest, func, x => cont( func(head) :: x))
+  }
+
+  // draw
+  //draw run a list of graphs and for each one run the list of point
+  //change the color of each point of those lists
+  //return a list of points
+
+  def drawfunc(c_new: Color, rest: List[(Int, Int, Color,String)], cont:List[(Int, Int, Color,String)]=>List[(Int, Int, Color,String)]): List[(Int, Int, Color,String)] =rest match{
+    case Nil => return cont(Nil)
+    case head :: tail => drawfunc(c_new,tail,x => cont((head._1, head._2, c_new, null)::x))
   }
 
   def lineR(x1: Int, y1: Int, x2: Int, y2: Int, dx: Int, dy: Int, d: Int, list: List[Point]): List[Point] = {
@@ -188,29 +201,25 @@ class BitmapOps(con:Controller) extends CommandTransformer[List[(Int, Int, Color
 
   }
 
-  // draw
-  //draw run a list of graphs and for each one run the list of point
-  //change the color of each point of those lists
-  //return a list of points
 
-  def drawfunc(c_new: Color, rest: List[(Int, Int, Color,String)], newList:List[(Int, Int, Color,String)]): List[(Int, Int, Color,String)] =rest match{
-    case Nil => return newList
-    case head :: tail => drawfunc(c_new,tail,(head._1, head._2, c_new, null) :: newList)
-  }
 
   //fill
   //change the color between the boundaries of a figure
   //return a list of point with a diferent color (the point inside the figure)
-  def fillfunc(c: Color, g: List[(Int, Int, Color,String)], newList:List[(Int, Int, Color,String)]): List[(Int, Int, Color,String)]= g match{
-    case Nil => return drawfunc(c,newList,List[(Int, Int, Color,String)]())
+
+
+  def fillfunc1(c: Color, g: List[(Int, Int, Color,String)], newList:List[(Int, Int, Color,String)]): List[(Int, Int, Color,String)]= g match{
+    case Nil => return newList
     case head :: tail => {
       val point: Option[(Int, Int, Color, String)] = tail.find(coords => coords._2 == head._2 && coords._1 != head._1)
       if (!point.isEmpty) {
         val linepoints = lineStart(head._1, head._2,point.head._1, point.head._2)
         val line = convertFromPointToTuple(linepoints, List[(Int, Int, Color, String)]())
-        fillfunc(c, tail, newList ::: line)
+        val coloredLine = drawfunc(c,line,x=>x)
+
+        fillfunc1(c, tail, newList ::: coloredLine)
       }else {
-        fillfunc(c, tail, newList)
+        fillfunc1(c, tail, newList)
       }
     }
   }
