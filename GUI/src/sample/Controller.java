@@ -81,11 +81,11 @@ public class Controller {
             if(!timerTaskRunning) {
                 timerTaskRunning=true;
                 timer=new Timer();
-                timer.schedule(task, 2000l);
+                timer.schedule(task, 200l);
             }else{
                 timer.cancel();
                 timer = new Timer();
-                timer.schedule(task, 2000l);
+                timer.schedule(task, 200l);
             }
         }catch (Exception e){
             System.out.println(e);

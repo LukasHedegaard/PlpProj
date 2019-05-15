@@ -52,11 +52,11 @@ class BitmapOps(con:Controller) extends CommandTransformer[List[(Int, Int, Color
                       && coor._2 <= y2)
   }
   def draw(c: String, rest: List[(Int, Int, Color,String)]): List[(Int, Int, Color,String)] = {
-    val drawfunctionColor = Color.web("#00FF0F")
+    val drawfunctionColor = Color.web(c)
     return drawfunc(drawfunctionColor, rest,x => x)
   }
   def fill(c: String, g: List[(Int, Int, Color,String)]): List[(Int, Int, Color,String)] = {
-    val fillfunctionColor = Color.web("#0F0F0F")
+    val fillfunctionColor = Color.web(c)
     val fillList = fillfunc1(fillfunctionColor,g,List[(Int, Int, Color,String)]())
 
     //return drawfunc(fillfunctionColor,fillList,x=>x)
