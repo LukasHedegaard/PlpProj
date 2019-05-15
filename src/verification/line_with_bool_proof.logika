@@ -1,0 +1,144 @@
+import org.sireum.logika._
+var P: ZS = ZS(1,2,3,4)
+
+val x1in: Z = readInt()
+val y1in: Z = readInt()
+
+val x2in: Z = readInt()
+val y2in: Z = readInt()
+
+val din: Z = readInt()
+
+assume(x1in > 0)
+
+// create list in good octant
+//lineR(x1, y1, x2, y2, x2, y2, d, List[Point]())
+
+@pure
+def lineR(x1: Z, y1: Z, x2: Z, y2: Z, dx: Z, dy: Z, d: Z):Z = {
+     l"""{
+            requires x1 >= 0
+                     y1 >= 0
+                     x2 >= 0
+                     y2 >= 0
+                     x2 >= x1
+                     y2 >= y1
+                     x2 >= y2
+                     dx >= 0
+                     dy >= 0
+                     x1 == x2 | (dy == y2 - y1 & dx == x2 - x1 & d == 2*dy - dx)
+        }"""
+
+        if(x1 == x2) {
+            return 0
+        } else {
+
+        if(d > 0) {
+            l"""{
+                1. x1 == x2 | (dy == y2 - y1 & dx == x2 - x1 & d == 2*dy - dx) premise
+                2. !(x1 == x2) premise
+                3. {
+                    4. (x1 == x2) assume
+                    5. ⊥     ¬e 4 2
+                    6. (dy == y2 - y1 & dx == x2 - x1 & d == 2*dy - dx) ⊥e 5
+                    }
+                7. {
+                    8. (dy == y2 - y1 & dx == x2 - x1 & d == 2*dy - dx) assume
+                   }
+                9. dy == y2 - y1 & dx == x2 - x1 & d == 2*dy - dx |e 1 3 7
+                10. dy == y2 - y1 & dx == x2 - x1 &e1 9
+                11. dy == y2 - y1 &e1 10
+                12. dx == x2 - x1 &e2 10
+                13. d == 2*dy - dx &e2 9
+            }"""
+
+
+            val x1next:Z = x1 + 1
+            l"""{
+                1. x1 >= 0          premise
+                2. ~(x1 == x2)      premise
+                3. x2 >= 0          premise
+                4. x2 >= x1         premise
+                5. x1next == x1 + 1 premise
+                6. x1next > x1      algebra 5
+                7. x2 > x1          algebra 2 4
+                8. x2 >= x1next     algebra 5 7
+            }"""
+
+            val y1next:Z = y1 + 1
+            l"""{
+                    1. y1 >= 0          premise
+                    2. y2 >= 0          premise
+                    3. y2 >= y1         premise
+                    4. y1next == y1 + 1 premise
+                    5. y1next > y1      algebra 4
+                    6. dy == y2 - y1    premise
+                    7. dx == x2 - x1    premise
+                    8. d == 2*dy - dx   premise
+                    9. d == 2*(y2 - y1) - dx subst1 6 8
+                    10. d == 2*(y2 - y1) - (x2 - x1) subst1 7 9
+                    11. x2 >= 0         premise
+                    12. x1 >= 0         premise
+                    13. x2 >= x1        premise
+                    14. y2 >= y1        premise
+                    15. d > 0           premise
+                    16. 2*(y2 - y1) > (x2 - x1) algebra 15 10
+                    17. x2 > x1         premise
+                    18. (x2 - x1) > 0   algebra 17 12
+                    19. 2*(y2 - y1) > 0 algebra 18 16
+                    20. y2 > y1         algebra 19
+                    21. y2 >= y1next    algebra 20 4
+                }"""
+
+            assert(x1next > x1)
+            assert(y1next > y1)
+            assert(x2 >= x1next)
+            assert(y2 >= y1next)
+
+            assume(x1next == x2 + 1)
+            l"""{
+                1. x1 >= 0          premise
+                2. x1next == x1 + 1 premise
+                3. x1next >= 0      algebra 1 2
+                4. y1 >= 0          premise
+                5. y1next == y1 + 1  premise
+                6. y1next >= 0      algebra 4 5
+                7. x1next == x2 + 1 premise
+                8. x1 == x2 algebra 2 7
+                9. x1 == x2 | (dy == y2 - y1 & dx == x2 - x1 & d == 2*dy - dx) premise
+            }"""
+
+            lineR(x1next, y1next, x2, y2, dx, dy,  d - 2*dx + 2*dy)
+            return 0
+        } else {
+            val x1next:Z = x1 + 1
+            l"""{
+                1. x1 >= 0          premise
+                2. ~(x1 == x2)      premise
+                3. x2 >= 0          premise
+                4. x2 >= x1         premise
+                5. x1next == x1 + 1 premise
+                6. x1next > x1      algebra 5
+                7. x2 > x1          algebra 2 4
+                8. x2 >= x1next     algebra 5 7
+            }"""
+
+            assert(x1next > x1)
+            assert(x2 >= x1next)
+
+            val dnext: Z = d + 2*dy
+
+            l"""{
+                1. x1 >= 0          premise
+                2. x1next == x1 + 1 premise
+                3. x1next >= 0      algebra 1 2
+                4. y1 >= 0          premise
+            }"""
+
+            lineR(x1next, y1, x2, y2, dx, dy, dnext)
+            return 0
+        }
+    }
+}
+
+
